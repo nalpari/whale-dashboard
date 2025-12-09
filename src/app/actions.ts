@@ -112,26 +112,40 @@ export async function getPageContent(pageId: string): Promise<string> {
 
         const data = await response.json();
 
+        interface RichTextItem {
+            plain_text: string;
+        }
+
+        interface NotionBlock {
+            type: string;
+            paragraph?: { rich_text: RichTextItem[] };
+            heading_1?: { rich_text: RichTextItem[] };
+            heading_2?: { rich_text: RichTextItem[] };
+            heading_3?: { rich_text: RichTextItem[] };
+            bulleted_list_item?: { rich_text: RichTextItem[] };
+            numbered_list_item?: { rich_text: RichTextItem[] };
+        }
+
         // Extract text content from blocks
         const textContent = data.results
-            .map((block: any) => {
+            .map((block: NotionBlock) => {
                 if (block.type === 'paragraph' && block.paragraph?.rich_text) {
-                    return block.paragraph.rich_text.map((rt: any) => rt.plain_text).join('');
+                    return block.paragraph.rich_text.map((rt) => rt.plain_text).join('');
                 }
                 if (block.type === 'heading_1' && block.heading_1?.rich_text) {
-                    return block.heading_1.rich_text.map((rt: any) => rt.plain_text).join('');
+                    return block.heading_1.rich_text.map((rt) => rt.plain_text).join('');
                 }
                 if (block.type === 'heading_2' && block.heading_2?.rich_text) {
-                    return block.heading_2.rich_text.map((rt: any) => rt.plain_text).join('');
+                    return block.heading_2.rich_text.map((rt) => rt.plain_text).join('');
                 }
                 if (block.type === 'heading_3' && block.heading_3?.rich_text) {
-                    return block.heading_3.rich_text.map((rt: any) => rt.plain_text).join('');
+                    return block.heading_3.rich_text.map((rt) => rt.plain_text).join('');
                 }
                 if (block.type === 'bulleted_list_item' && block.bulleted_list_item?.rich_text) {
-                    return '• ' + block.bulleted_list_item.rich_text.map((rt: any) => rt.plain_text).join('');
+                    return '• ' + block.bulleted_list_item.rich_text.map((rt) => rt.plain_text).join('');
                 }
                 if (block.type === 'numbered_list_item' && block.numbered_list_item?.rich_text) {
-                    return '- ' + block.numbered_list_item.rich_text.map((rt: any) => rt.plain_text).join('');
+                    return '- ' + block.numbered_list_item.rich_text.map((rt) => rt.plain_text).join('');
                 }
                 return '';
             })

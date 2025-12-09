@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { NotionRecord } from '@/lib/notion';
 import { getRecords } from '@/app/actions';
 import RecordList from './RecordList';
@@ -52,7 +52,6 @@ export default function Dashboard() {
         return records.filter((r) => r.assignee === selectedAssignee);
     }, [records, selectedAssignee]);
 
-    const selectedAssigneeCount = selectedAssignee ? (counts[selectedAssignee] || 0) : records.length;
 
     return (
         <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans transition-colors duration-300">
@@ -94,7 +93,7 @@ export default function Dashboard() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold mb-2">Tasks Overview</h2>
-                    <p className="text-gray-500 dark:text-gray-400">Manage and track your team's progress.</p>
+                    <p className="text-gray-500 dark:text-gray-400">Manage and track your team&apos;s progress.</p>
                 </div>
 
                 <AssigneeFilter

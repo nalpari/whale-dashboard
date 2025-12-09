@@ -1,5 +1,3 @@
-import { Client } from '@notionhq/client';
-
 // We are using native fetch because the Client's databases.query method was missing/broken
 // and notion.request was failing with Invalid URL.
 
@@ -14,6 +12,8 @@ export interface NotionRecord {
   assigneeAvatarUrl: string | null;
   lastEditedTime: string;
   url: string;
+  depth1: string | null;
+  depth2: string | null;
 }
 
 export const fetchDatabaseRecords = async (): Promise<NotionRecord[]> => {
@@ -57,7 +57,23 @@ export const fetchDatabaseRecords = async (): Promise<NotionRecord[]> => {
 
     const data = await response.json();
 
-    return data.results.map((page: any) => {
+    interface NotionPropertyValue {
+      title?: { plain_text: string }[];
+      select?: { name: string };
+      status?: { name: string };
+      multi_select?: { name: string; avatar_url?: string }[];
+      people?: { name: string; avatar_url?: string }[];
+      rich_text?: { plain_text: string }[];
+    }
+
+    interface NotionPage {
+      id: string;
+      last_edited_time: string;
+      url: string;
+      properties: Record<string, NotionPropertyValue>;
+    }
+
+    return data.results.map((page: NotionPage) => {
       const props = page.properties;
 
       // Map properties based on actual DB schema found in debug
@@ -81,6 +97,17 @@ export const fetchDatabaseRecords = async (): Promise<NotionRecord[]> => {
       const assignee = assigneeData?.name || null;
       const assigneeAvatarUrl = assigneeData?.avatar_url || null;
 
+      // 1Depth and 2Depth columns (capital D)
+      const depth1 = props['1Depth']?.select?.name ||
+        props['1Depth']?.multi_select?.[0]?.name ||
+        props['1Depth']?.rich_text?.[0]?.plain_text ||
+        null;
+
+      const depth2 = props['2Depth']?.select?.name ||
+        props['2Depth']?.multi_select?.[0]?.name ||
+        props['2Depth']?.rich_text?.[0]?.plain_text ||
+        null;
+
       return {
         id: page.id,
         title,
@@ -89,6 +116,8 @@ export const fetchDatabaseRecords = async (): Promise<NotionRecord[]> => {
         assigneeAvatarUrl,
         lastEditedTime: page.last_edited_time,
         url: page.url,
+        depth1,
+        depth2,
       };
     });
   } catch (error) {

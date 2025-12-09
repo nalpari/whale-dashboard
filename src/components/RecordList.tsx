@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
+import Image from 'next/image';
 import { NotionRecord } from '@/lib/notion';
 import { updateRecordStatus, updateRecordTitle, updatePageContent } from '@/app/actions';
 import StatusDropdown from './StatusDropdown';
@@ -12,36 +13,6 @@ interface RecordListProps {
     onRecordUpdate?: () => void;
 }
 
-const getStatusColor = (status: string) => {
-    const statusLower = status.toLowerCase();
-
-    // Completed - Green
-    if (statusLower.includes('완료') || statusLower.includes('done') || statusLower.includes('complete')) {
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300';
-    }
-    // In Progress - Blue
-    if (statusLower.includes('진행') || statusLower.includes('progress') || statusLower.includes('doing')) {
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300';
-    }
-    // Issue - Red
-    if (statusLower.includes('이슈') || statusLower.includes('issue') || statusLower.includes('block')) {
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300';
-    }
-    // Delay - Yellow/Orange
-    if (statusLower.includes('딜레이') || statusLower.includes('delay') || statusLower.includes('hold')) {
-        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300';
-    }
-    // Not Started - Gray
-    if (statusLower.includes('시작') || statusLower.includes('not started') || statusLower.includes('to do') || statusLower.includes('todo')) {
-        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300';
-    }
-    // Review - Purple
-    if (statusLower.includes('review') || statusLower.includes('검토')) {
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300';
-    }
-    // Default - Gray
-    return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
-};
 
 export default function RecordList({ records, isLoading, onRecordUpdate }: RecordListProps) {
     const [updatingRecords, setUpdatingRecords] = useState<Set<string>>(new Set());
@@ -119,6 +90,12 @@ export default function RecordList({ records, isLoading, onRecordUpdate }: Recor
                                 Title
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                1depth
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                2depth
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Status
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -141,6 +118,16 @@ export default function RecordList({ records, isLoading, onRecordUpdate }: Recor
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                                        {record.depth1 || '-'}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                                        {record.depth2 || '-'}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
                                     {updatingRecords.has(record.id) ? (
                                         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 animate-pulse">
                                             Updating...
@@ -155,7 +142,7 @@ export default function RecordList({ records, isLoading, onRecordUpdate }: Recor
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
                                         {record.assigneeAvatarUrl ? (
-                                            <img className="h-6 w-6 rounded-full mr-2" src={record.assigneeAvatarUrl} alt="" />
+                                            <Image className="h-6 w-6 rounded-full mr-2" src={record.assigneeAvatarUrl} alt="" width={24} height={24} />
                                         ) : (
                                             <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-700 mr-2 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">
                                                 {record.assignee ? record.assignee[0] : '?'}
@@ -195,10 +182,24 @@ export default function RecordList({ records, isLoading, onRecordUpdate }: Recor
                                 />
                             )}
                         </div>
+                        {(record.depth1 || record.depth2) && (
+                            <div className="flex gap-2 mb-2 text-xs">
+                                {record.depth1 && (
+                                    <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded">
+                                        {record.depth1}
+                                    </span>
+                                )}
+                                {record.depth2 && (
+                                    <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded">
+                                        {record.depth2}
+                                    </span>
+                                )}
+                            </div>
+                        )}
                         <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
                             <div className="flex items-center">
                                 {record.assigneeAvatarUrl ? (
-                                    <img className="h-5 w-5 rounded-full mr-2" src={record.assigneeAvatarUrl} alt="" />
+                                    <Image className="h-5 w-5 rounded-full mr-2" src={record.assigneeAvatarUrl} alt="" width={20} height={20} />
                                 ) : (
                                     <div className="h-5 w-5 rounded-full bg-gray-200 dark:bg-gray-700 mr-2 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">
                                         {record.assignee ? record.assignee[0] : '?'}
