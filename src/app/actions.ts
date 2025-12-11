@@ -6,6 +6,12 @@ export async function getRecords() {
     return await fetchDatabaseRecords();
 }
 
+export async function getRecord(id: string) {
+    const { fetchPage } = await import('@/lib/notion'); // Dynamic import to avoid cycles or context issues if any
+    return await fetchPage(id);
+}
+
+
 export async function updateRecordStatus(pageId: string, newStatus: string) {
     const apiKey = getApiKey();
 

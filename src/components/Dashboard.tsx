@@ -7,11 +7,13 @@ import RecordList from './RecordList';
 import AssigneeFilter from './AssigneeFilter';
 import AssigneeStats from './AssigneeStats';
 import ThemeToggle from './ThemeToggle';
+import HeroSection from './HeroSection';
 
 export default function Dashboard() {
     const [records, setRecords] = useState<NotionRecord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedAssignee, setSelectedAssignee] = useState<string | null>(null);
+
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -91,7 +93,8 @@ export default function Dashboard() {
             </header>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8">
+                <HeroSection />
+                <div id="dashboard-content" className="mb-8 pt-12">
                     <h2 className="text-3xl font-bold mb-2">Tasks Overview</h2>
                     <p className="text-gray-500 dark:text-gray-400">Manage and track your team&apos;s progress.</p>
                 </div>

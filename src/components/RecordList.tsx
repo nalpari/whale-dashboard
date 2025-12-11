@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { NotionRecord } from '@/lib/notion';
 import { updateRecordStatus, updateRecordTitle, updatePageContent } from '@/app/actions';
@@ -39,10 +40,12 @@ export default function RecordList({ records, isLoading, onRecordUpdate }: Recor
         }
     };
 
+    const router = useRouter();
+
     const handleTaskClick = (record: NotionRecord) => {
-        setSelectedRecord(record);
-        setIsModalOpen(true);
+        router.push(`/record/${record.id}`);
     };
+
 
     const handleModalSave = async (recordId: string, updates: { title?: string; status?: string; content?: string }) => {
         try {
