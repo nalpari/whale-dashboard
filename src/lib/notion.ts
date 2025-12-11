@@ -125,3 +125,75 @@ export const fetchDatabaseRecords = async (): Promise<NotionRecord[]> => {
     return [];
   }
 };
+
+export const fetchPage = async (pageId: string): Promise<NotionRecord | null> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.error('NOTION_API_KEY is not defined');
+    return null;
+  }
+
+  try {
+    const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Notion-Version': '2022-06-28',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      console.error('Notion API Error:', response.status);
+      return null;
+    }
+
+    const page = await response.json();
+    const props = page.properties;
+
+    // Helper to extract properties safely
+    const title = props.Task?.title?.[0]?.plain_text ||
+      props.Name?.title?.[0]?.plain_text ||
+      props.Title?.title?.[0]?.plain_text ||
+      'Untitled';
+
+    const status = props.Status?.select?.name ||
+      props.Status?.status?.name ||
+      'No Status';
+
+    const assigneeData = props.Assignee?.multi_select?.[0] ||
+      props.Assignee?.people?.[0] ||
+      props.Person?.people?.[0];
+
+    const assignee = assigneeData?.name || null;
+    const assigneeAvatarUrl = assigneeData?.avatar_url || null;
+
+    const depth1 = props['1Depth']?.select?.name ||
+      props['1Depth']?.multi_select?.[0]?.name ||
+      props['1Depth']?.rich_text?.[0]?.plain_text ||
+      null;
+
+    const depth2 = props['2Depth']?.select?.name ||
+      props['2Depth']?.multi_select?.[0]?.name ||
+      props['2Depth']?.rich_text?.[0]?.plain_text ||
+      null;
+
+    return {
+      id: page.id,
+      title,
+      status,
+      assignee,
+      assigneeAvatarUrl,
+      lastEditedTime: page.last_edited_time,
+      url: page.url,
+      depth1,
+      depth2,
+    };
+
+  } catch (error) {
+    console.error('Error fetching page:', error);
+    return null;
+  }
+};
+
