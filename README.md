@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Whale Dashboard
 
-## Getting Started
+Notion API와 연동하여 작업을 관리하는 대시보드 애플리케이션입니다.
 
-First, run the development server:
+## 주요 기능
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Notion 데이터베이스의 작업 목록 조회 및 표시
+- 담당자별, 상태별 필터링
+- 작업 제목 및 상태 수정
+- 작업 상세 페이지에서 마크다운 콘텐츠 편집
+- 다크/라이트 테마 지원
+
+## 기술 스택
+
+- **Framework**: Next.js 16 (App Router)
+- **React**: 19.2 with React Compiler
+- **Styling**: Tailwind CSS 4
+- **Markdown**: @uiw/react-md-editor
+
+## 시작하기
+
+### 환경 변수 설정
+
+`.env.local` 파일을 생성하고 다음 환경 변수를 설정합니다:
+
+```
+NOTION_API_KEY=<your-notion-integration-token>
+NOTION_DATABASE_ID=<your-database-id>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 설치 및 실행
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# 의존성 설치
+pnpm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 개발 서버 실행
+pnpm dev
+```
 
-## Learn More
+[http://localhost:3000](http://localhost:3000)에서 애플리케이션을 확인할 수 있습니다.
 
-To learn more about Next.js, take a look at the following resources:
+## 스크립트
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm dev      # 개발 서버 실행
+pnpm build    # 프로덕션 빌드
+pnpm start    # 프로덕션 서버 실행
+pnpm lint     # ESLint 실행
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notion 데이터베이스 설정
 
-## Deploy on Vercel
+다음 속성을 가진 Notion 데이터베이스가 필요합니다:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| 속성명 | 타입 | 설명 |
+|--------|------|------|
+| Task | Title | 작업 제목 |
+| Status | Select | 작업 상태 |
+| Assignee | Multi-select / People | 담당자 |
+| 1Depth | Select | 1차 분류 (선택) |
+| 2Depth | Select | 2차 분류 (선택) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 배포
+
+Vercel에서 손쉽게 배포할 수 있습니다:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new?utm_medium=default-template&filter=next.js)

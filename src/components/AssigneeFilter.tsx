@@ -18,8 +18,10 @@ export default function AssigneeFilter({
     const totalCount = Object.values(counts).reduce((a, b) => a + b, 0);
 
     return (
-        <div className="flex flex-wrap gap-2 mb-6">
-            <button
+        <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">담당자</h3>
+            <div className="flex flex-wrap gap-2">
+                <button
                 onClick={() => onSelectAssignee(null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${selectedAssignee === null
                         ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
@@ -40,6 +42,7 @@ export default function AssigneeFilter({
                     {assignee} <span className="ml-1 opacity-60 text-xs">({counts[assignee] || 0})</span>
                 </button>
             ))}
+            </div>
         </div>
     );
 }

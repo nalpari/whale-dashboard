@@ -5,6 +5,7 @@ import { NotionRecord } from '@/lib/notion';
 import { getRecords } from '@/app/actions';
 import RecordList from './RecordList';
 import AssigneeFilter from './AssigneeFilter';
+import StatusFilter from './StatusFilter';
 import AssigneeStats from './AssigneeStats';
 import ThemeToggle from './ThemeToggle';
 import HeroSection from './HeroSection';
@@ -13,6 +14,7 @@ export default function Dashboard() {
     const [records, setRecords] = useState<NotionRecord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedAssignee, setSelectedAssignee] = useState<string | null>(null);
+    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
 
     const fetchData = async () => {
@@ -39,7 +41,7 @@ export default function Dashboard() {
         return Array.from(uniqueAssignees).sort();
     }, [records]);
 
-    const counts = useMemo(() => {
+    const assigneeCounts = useMemo(() => {
         const c: Record<string, number> = {};
         records.forEach((r) => {
             if (r.assignee) {
@@ -49,10 +51,37 @@ export default function Dashboard() {
         return c;
     }, [records]);
 
+    const statuses = useMemo(() => {
+        const uniqueStatuses = new Set<string>();
+        records.forEach((r) => {
+            if (r.status) uniqueStatuses.add(r.status);
+        });
+        return Array.from(uniqueStatuses).sort();
+    }, [records]);
+
+    const statusCounts = useMemo(() => {
+        const c: Record<string, number> = {};
+        records.forEach((r) => {
+            if (r.status) {
+                c[r.status] = (c[r.status] || 0) + 1;
+            }
+        });
+        return c;
+    }, [records]);
+
     const filteredRecords = useMemo(() => {
-        if (!selectedAssignee) return records;
-        return records.filter((r) => r.assignee === selectedAssignee);
-    }, [records, selectedAssignee]);
+        let filtered = records;
+        
+        if (selectedAssignee) {
+            filtered = filtered.filter((r) => r.assignee === selectedAssignee);
+        }
+        
+        if (selectedStatus) {
+            filtered = filtered.filter((r) => r.status === selectedStatus);
+        }
+        
+        return filtered;
+    }, [records, selectedAssignee, selectedStatus]);
 
 
     return (
@@ -103,7 +132,14 @@ export default function Dashboard() {
                     assignees={assignees}
                     selectedAssignee={selectedAssignee}
                     onSelectAssignee={setSelectedAssignee}
-                    counts={counts}
+                    counts={assigneeCounts}
+                />
+
+                <StatusFilter
+                    statuses={statuses}
+                    selectedStatus={selectedStatus}
+                    onSelectStatus={setSelectedStatus}
+                    counts={statusCounts}
                 />
 
                 <AssigneeStats
